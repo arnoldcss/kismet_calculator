@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "com.kismetcalc.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "ContainerScreenAccessor",
+    "ContainerScreenMixin",
+    "RerollBlockMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

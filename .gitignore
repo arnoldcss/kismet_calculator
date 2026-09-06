@@ -1,0 +1,9 @@
+.gradle/
+build/
+run/
+.idea/
+*.iml
+
+# Scratch output from tools/price-cache-probe.sh
+tools/out/
+tools/
