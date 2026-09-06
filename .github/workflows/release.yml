@@ -1,0 +1,52 @@
+name: release
+on:
+  push:
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'version to release (without leading v)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: resolve version
+        id: version
+        run: echo "version=${{ github.event.inputs.version || github.ref_name }}" | sed 's/=v/=/' >> "$GITHUB_OUTPUT"
+
+      - name: validate gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: setup jdk 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: 25
+
+      - name: make gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: build
+        run: ./gradlew build -Pmod_version=${{ steps.version.outputs.version }}
+
+      - name: collect mod jar
+        run: |
+          mkdir -p release
+          find build/libs -name '*.jar' ! -name '*-sources.jar' ! -name '*-dev.jar' -exec cp {} release/ \;
+          ls -l release
+
+      - name: publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: kismetcalc ${{ steps.version.outputs.version }}
+          generate_release_notes: true
+          files: release/*.jar
