@@ -17,8 +17,17 @@ reroll it. Fabric, Minecraft 26.1.2, client only.
 | `/kismet prices` | what it thinks each drop is worth, and where the price came from |
 | `/kismet unknown` | reward lines it could not identify, and items with no price |
 
-Set the meter. It moves the threshold by roughly two million coins and the mod cannot read it
-on its own.
+## The meter
+
+The meter moves the threshold by roughly two million coins, so it is worth keeping honest. Open
+the M7 RNG meter menu once and the mod reads your progress off it, then follows along by counting
+the score of each run afterwards.
+
+**Reopen that menu whenever the meter resets** — when the handle actually drops, for instance.
+The mod only ever counts score upwards, so it cannot see a reset on its own and will keep
+reporting a meter that is fuller than yours really is until you reseed it.
+
+`/kismet meter <0-100>` sets the number by hand if you would rather not open the menu.
 
 Settings live in `config/kismetcalc.properties`.
 

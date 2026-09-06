@@ -168,6 +168,11 @@ public final class RngMeterTracker {
         save();
     }
 
+    /** Last dungeon floor seen on the sidebar, or null before one has been read. */
+    public String floor() {
+        return lastFloor;
+    }
+
     public Progress progress(String floor) {
         Long seed = seeded.get(floor);
         Long need = needed.get(floor);

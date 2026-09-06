@@ -21,8 +21,9 @@ public final class ChestReader {
     public static final Pattern CHEST_TITLE =
         Pattern.compile("^(?:Wood|Gold|Diamond|Emerald|Obsidian|Bedrock)(?: Chest)?$");
 
+    // M7 only: the loot table and every verdict below it are Master Floor VII's.
     public static final Pattern RUN_TITLE =
-        Pattern.compile("^(?:Master (?:Mode )?)?Catacombs\\b.*");
+        Pattern.compile("^Master (?:Mode )?Catacombs\\b.*\\bVII$");
 
     private static final String[] TIERS = {"Wood", "Gold", "Diamond", "Emerald", "Obsidian", "Bedrock"};
 

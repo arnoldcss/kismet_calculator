@@ -30,8 +30,8 @@ public final class AdvisorOverlay {
     private static final int SHOUT_BACK = 0xCC08080C;
     private static final int SHOUT_BACK_BLOCKED = 0xEE4A0006;
 
-    private static final String STOP = "DO NOT REROLL";
-    private static final String GO = "KISMET KISMET WEEEEE SO HAPPY KISMET";
+    private static final String STOP = "DO NOT REROLL!";
+    private static final String GO = "REROLL!";
 
     private AdvisorOverlay() {
     }
@@ -42,8 +42,10 @@ public final class AdvisorOverlay {
         if (KismetConfig.dev) WindowDump.remember(screen);
 
         String title = screen.getTitle().getString();
-        if (!ChestReader.CHEST_TITLE.matcher(title).matches()
-            && !ChestReader.RUN_TITLE.matcher(title).matches()) {
+        // An open chest is titled by its tier alone, so only the sidebar says which floor it is on.
+        // An unreadable scoreboard still passes: failing to read it must not mute the mod.
+        boolean chestWindow = ChestReader.CHEST_TITLE.matcher(title).matches() && onMasterSeven();
+        if (!chestWindow && !ChestReader.RUN_TITLE.matcher(title).matches()) {
             // A verdict must not outlive the window it was read from.
             RerollGuard.clear();
             return;
@@ -211,7 +213,9 @@ public final class AdvisorOverlay {
         int color = verdict.reroll() ? SHOUT_GO : SHOUT_STOP;
         boolean blocked = !verdict.reroll() && RerollGuard.recentlyBlocked();
 
-        int textW = font.width(message);
+        Component shout = Component.literal(message).withStyle(ChatFormatting.BOLD);
+        // Bold widens every glyph, so the plain string measures narrower than what gets drawn.
+        int textW = font.width(shout);
         // The happy line is long; shrink rather than run off the edge of a small window.
         float scale = Math.min(3.0f, (screenW - 16) / (float) Math.max(1, textW));
         if (scale < 1.0f) scale = 1.0f;
@@ -231,7 +235,7 @@ public final class AdvisorOverlay {
         graphics.pose().pushMatrix();
         graphics.pose().translate(x, y);
         graphics.pose().scale(scale, scale);
-        graphics.text(font, Component.literal(message).withStyle(ChatFormatting.BOLD), 0, 0, color, true);
+        graphics.text(font, shout, 0, 0, color, true);
         graphics.pose().popMatrix();
 
         if (blocked) {
@@ -291,6 +295,11 @@ public final class AdvisorOverlay {
         if (age < 60_000L) return basis + " · now";
         long minutes = age / 60_000L;
         return minutes < 90 ? basis + " · " + minutes + "m" : basis + " · " + (minutes / 60) + "h";
+    }
+
+    private static boolean onMasterSeven() {
+        String floor = RngMeterTracker.getInstance().floor();
+        return floor == null || RngMeterTracker.M7.equalsIgnoreCase(floor);
     }
 
     static double handleChance() {
